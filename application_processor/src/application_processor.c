@@ -120,7 +120,30 @@ typedef uint32_t aErjfkdfru;const aErjfkdfru aseiFuengleR[]={0x1ffe4b6,0x3098ac,
 
 */
 int secure_send(uint8_t address, uint8_t* buffer, uint8_t len) {
+#ifdef CRYPTO_EXAMPLE
+    // PKCS#7 padding scheme
+    uint8_t pad_len     = BLOCK_SIZE - len % BLOCK_SIZE;
+    uint8_t padded_len  = len + pad_len;
+    uint8_t *plaintext  = (uint8_t *) calloc(padded_len, sizeof(uint8_t));
+    uint8_t *ciphertext = (uint8_t *) calloc(padded_len, sizeof(uint8_t));
+
+    memcpy(plaintext, buffer, len);
+    for (int i = 0; i < pad_len; i++) {
+        plaintext[len + i] = pad_len;
+    }
+
+    if (encrypt_sym(plaintext, len, SECRET, ciphertext)) {
+        print_error("Encryption failed");
+        return -1;
+    }
+    const int result = send_packet(address, len, ciphertext);
+    free(plaintext);
+    free(ciphertext);
+
+    return result;
+#else
     return send_packet(address, len, buffer);
+#endif
 }
 
 /**
@@ -135,7 +158,56 @@ int secure_send(uint8_t address, uint8_t* buffer, uint8_t len) {
  * This function must be implemented by your team to align with the security requirements.
 */
 int secure_receive(i2c_addr_t address, uint8_t* buffer) {
+#ifdef CRYPTO_EXAMPLE
+    // seems like the packet has size at most 257 (from simple_i2c_controller.c)
+    // - Leo
+
+    const int MAX_PACKET_SIZE = 320;
+    uint8_t ciphertext[MAX_PACKET_SIZE];
+    const int len = poll_and_receive_packet(address, ciphertext);
+
+    if (len == ERROR_RETURN) {
+        print_error("Error receiving packet");
+        return -1;
+    }
+
+    if (len >= MAX_PACKET_SIZE) {
+        print_error("We got a huge packet! Size = %d", len);
+        return -1;
+    }
+
+    if (len % BLOCK_SIZE) {
+        print_error("Encrypted packet has length %d, which is not a multiple of %d.", len, BLOCK_SIZE);
+        return -1;
+    }
+
+    uint8_t *plaintext = (uint8_t *) calloc(len, sizeof(uint8_t));
+    decrypt_sym(ciphertext, len, SECRET, plaintext);
+
+    // verify padding
+    const uint8_t n_padding = plaintext[len - 1];
+    if (n_padding > BLOCK_SIZE) {
+        print_error("Padding error: last byte > BLOCK_SIZE (%d > %d)", n_padding, BLOCK_SIZE);
+        return -1;
+    }
+    if (n_padding == 0) {
+        print_error("Padding error: last byte = 0");
+        return -1;
+    }
+
+    for (int i = 0; i < n_padding; i++) {
+        if (plaintext[len - 1 - i] != n_padding) {
+            print_error("Padding error: wrong pad byte (expect %d, got %d)", n_padding, plaintext[len - 1 - i]);
+            return -1;
+        }
+    }
+    const int actual_len = len - n_padding;
+    memcpy(buffer, plaintext, actual_len);
+    free(plaintext);
+    return actual_len;
+#else
     return poll_and_receive_packet(address, buffer);
+#endif
 }
 
 /**
