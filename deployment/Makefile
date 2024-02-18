@@ -8,7 +8,7 @@ __check_defined = \
 		$(error Undefined $1))
 
 all:
-	echo "#define SECRET 1234" > global_secrets.h
+	python gen_global_secret.py
 
 clean:
 	rm -f global_secrets.h
