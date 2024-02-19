@@ -34,8 +34,10 @@ ENTRY=firmware_startup
 # WolfSSL must be included in this directory as wolfssl/
 # WolfSSL can be downloaded from: https://www.wolfssl.com/download/
 
+# have the crypto example off when uploading to github
+
 # Disable Crypto Example
-# CRYPTO_EXAMPLE=0
+CRYPTO_EXAMPLE=0
 
 # Enable Crypto Example
-CRYPTO_EXAMPLE=1
+# CRYPTO_EXAMPLE=1
