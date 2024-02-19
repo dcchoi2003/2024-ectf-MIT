@@ -37,7 +37,7 @@ ENTRY=firmware_startup
 # have the crypto example off when uploading to github
 
 # Disable Crypto Example
-CRYPTO_EXAMPLE=0
+# CRYPTO_EXAMPLE=0
 
 # Enable Crypto Example
-# CRYPTO_EXAMPLE=1
+CRYPTO_EXAMPLE=1
