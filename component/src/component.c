@@ -28,6 +28,9 @@
 #include "ectf_params.h"
 #include "global_secrets.h"
 
+#include <stdlib.h>
+#define BLOCK_SIZE 16
+
 #ifdef POST_BOOT
 #include "led.h"
 #include <stdint.h>
@@ -109,7 +112,7 @@ void secure_send(uint8_t* buffer, uint8_t len) {
     }
 
     if (encrypt_sym(plaintext, len, SECRET, ciphertext)) {
-        print_error("Encryption failed");
+        // print_error("Encryption failed");
         exit(0);
     }
     send_packet_and_ack(len, ciphertext);
@@ -140,17 +143,17 @@ int secure_receive(uint8_t* buffer) {
     const int len = wait_and_receive_packet(ciphertext);
 
     if (len == ERROR_RETURN) {
-        print_error("Error receiving packet");
+        // print_error("Error receiving packet");
         return -1;
     }
 
     if (len >= MAX_PACKET_SIZE) {
-        print_error("We got a huge packet! Size = %d", len);
+        // print_error("We got a huge packet! Size = %d", len);
         return -1;
     }
 
     if (len % BLOCK_SIZE) {
-        print_error("Encrypted packet has length %d, which is not a multiple of %d.", len, BLOCK_SIZE);
+        // print_error("Encrypted packet has length %d, which is not a multiple of %d.", len, BLOCK_SIZE);
         return -1;
     }
 
@@ -160,17 +163,17 @@ int secure_receive(uint8_t* buffer) {
     // verify padding
     const uint8_t n_padding = plaintext[len - 1];
     if (n_padding > BLOCK_SIZE) {
-        print_error("Padding error: last byte > BLOCK_SIZE (%d > %d)", n_padding, BLOCK_SIZE);
+        // print_error("Padding error: last byte > BLOCK_SIZE (%d > %d)", n_padding, BLOCK_SIZE);
         return -1;
     }
     if (n_padding == 0) {
-        print_error("Padding error: last byte = 0");
+        // print_error("Padding error: last byte = 0");
         return -1;
     }
 
     for (int i = 0; i < n_padding; i++) {
         if (plaintext[len - 1 - i] != n_padding) {
-            print_error("Padding error: wrong pad byte (expect %d, got %d)", n_padding, plaintext[len - 1 - i]);
+            // print_error("Padding error: wrong pad byte (expect %d, got %d)", n_padding, plaintext[len - 1 - i]);
             return -1;
         }
     }
