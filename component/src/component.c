@@ -27,6 +27,7 @@
 // Includes from containerized build
 #include "ectf_params.h"
 #include "global_secrets.h"
+#include "simple_crypto.h"
 
 #include <stdlib.h>
 #define BLOCK_SIZE 16
