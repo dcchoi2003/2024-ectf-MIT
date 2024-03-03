@@ -28,6 +28,9 @@
 #include "ectf_params.h"
 #include "global_secrets.h"
 
+// MIT: Includes for our custom features
+#include "common_init.h"
+
 #ifdef POST_BOOT
 #include "led.h"
 #include <stdint.h>
@@ -209,6 +212,9 @@ int main(void) {
     
     // Enable Global Interrupts
     __enable_irq();
+
+    // MIT: Initialize our custom features
+    common_init();
     
     // Initialize Component
     i2c_addr_t addr = component_id_to_i2c_addr(COMPONENT_ID);

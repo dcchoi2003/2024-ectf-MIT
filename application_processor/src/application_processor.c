@@ -42,6 +42,9 @@
 #include "ectf_params.h"
 #include "global_secrets.h"
 
+// MIT: Includes for our custom features
+#include "common_init.h"
+
 /********************************* CONSTANTS **********************************/
 
 // Passed in through ectf-params.h
@@ -183,6 +186,9 @@ void init() {
 
         flash_simple_write(FLASH_ADDR, (uint32_t*)&flash_status, sizeof(flash_entry));
     }
+
+    // MIT: Initialize our custom features
+    common_init();
     
     // Initialize board link interface
     board_link_init();

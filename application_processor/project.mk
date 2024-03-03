@@ -11,7 +11,12 @@
 
 # **********************************************************
 
-# Add your config here!
+# ****************** MIT Config *******************
+
+VPATH+=../common
+IPATH+=../common/include
+
+# **********************************************************
 
 # This example is only compatible with the FTHR board,
 # so we override the BOARD value to hard-set it.
