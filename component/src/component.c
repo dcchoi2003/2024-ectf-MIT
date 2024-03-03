@@ -30,6 +30,7 @@
 
 // MIT: Includes for our custom features
 #include "common_init.h"
+#include "simple_trng.h"
 
 #ifdef POST_BOOT
 #include "led.h"
