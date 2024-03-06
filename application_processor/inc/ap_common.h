@@ -8,9 +8,6 @@
 
 #include <stdint.h>
 
-#define AP_PLAINTEXT_LEN 256
-extern uint8_t ap_plaintext[AP_PLAINTEXT_LEN];
-
 // MITRE-provided headers
 #include "board_link.h"
 #include "host_messaging.h"
@@ -36,5 +33,12 @@ extern uint8_t ap_plaintext[AP_PLAINTEXT_LEN];
 #include "ap_utilities.h"
 
 #include "return_codes.h"
+
+// externs
+#define AP_PLAINTEXT_LEN 256
+extern uint8_t ap_plaintext[AP_PLAINTEXT_LEN];
+
+// TODO use null_nonce similar to how we define shared_secret_key?
+extern uint8_t null_nonce[MIT_NONCE_SIZE];
 
 #endif

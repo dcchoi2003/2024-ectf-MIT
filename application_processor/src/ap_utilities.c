@@ -75,6 +75,7 @@ mit_session_t * get_session_of_component(mit_comp_id_t component_id) {
     return NULL;
 }
 
+// TODO bake num_components into source code vs this struct?
 // Return number of provisioned components
 int get_num_components(void) {
     return flash_status.component_cnt;
@@ -84,6 +85,20 @@ int get_num_components(void) {
 mit_comp_id_t get_component_id(int id) {
     if (id < flash_status.component_cnt) {
         return flash_status.component_ids[id];
+    }
+
+    return ERROR_RETURN;
+}
+
+// Find component id from i2c addr
+int i2c_addr_to_component_id(i2c_addr_t addr, mit_comp_id_t * component_id) {
+    for (int i = 0; i < get_num_components(); i++) {
+        mit_comp_id_t provisioned_component = flash_status.component_ids[i];
+        i2c_addr_t provisioned_addr = component_id_to_i2c_addr(provisioned_component);
+        if (provisioned_addr == addr) {
+            *component_id = provisioned_component;
+            return SUCCESS_RETURN;
+        }
     }
 
     return ERROR_RETURN;

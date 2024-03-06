@@ -181,7 +181,61 @@ void secure_send(uint8_t* buffer, uint8_t len) {
  * This function must be implemented by your team to align with the security requirements.
 */
 int secure_receive(uint8_t* buffer) {
-    return wait_and_receive_packet(buffer);
+    int ret;
+    mit_packet_t * packet = (mit_packet_t *) receive_buffer;
+
+    // TODO validate len?
+    int len = wait_and_receive_packet(packet);
+
+    // TODO validate received packet
+    /*************** VALIDATE RECEIVED PACKET ****************/
+    if (packet->ad.comp_id != COMPONENT_ID) {
+        printf("error: rx packet (0x%08x) doesn't match given component id (0x%08x)\n", packet->ad.comp_id, COMPONENT_ID);
+        return ERROR_RETURN;
+    }
+
+    // TODO use ifdefs for this section
+    if (packet->ad.for_ap != false) {
+        printf("error: rx packet not tagged for component\n");
+        return ERROR_RETURN;
+    }
+
+    if (packet->ad.len == 0) {
+        printf("error: rx packet has null message length\n");
+        return ERROR_RETURN;
+    }
+
+    // not a post-boot cmd
+    if (packet->ad.opcode != MIT_CMD_NONE) {
+        printf("error: rx packet not post-boot-related, opcode 0x%02x\n", packet->ad.opcode);
+        return ERROR_RETURN;
+    }
+
+    // We don't allow resetting nonces post-boot.
+    if (memcmp(session.incoming_nonce.rawBytes, packet->ad.nonce.rawBytes, sizeof(mit_nonce_t)) == 0) {
+        // incoming nonce matches expected nonce
+        ret = mit_decrypt(packet, comp_plaintext);
+
+        if (ret != SUCCESS_RETURN) {
+            printf("error: decryption failed with error code %i\n", ret);
+            memset(comp_plaintext, 0, COMP_PLAINTEXT_LEN);
+            return ERROR_RETURN;
+        }
+
+    } else {
+        printf("error: Incoming nonce (seq 0x%08x) doesn't match expected nonce (seq 0x%08x)\n",
+            packet->ad.nonce.sequenceNumber, session.incoming_nonce.sequenceNumber
+        );
+        return ERROR_RETURN;
+    }
+
+    memcpy(buffer, comp_plaintext, len);
+
+    // TODO best place for this?
+    // increase incoming nonce
+    session.incoming_nonce.sequenceNumber += 1;
+
+    return len;
 }
 
 /******************************* FUNCTION DEFINITIONS *********************************/

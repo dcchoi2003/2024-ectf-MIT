@@ -19,6 +19,9 @@ int get_num_components(void);
 // Return component_id stored in slot `id`
 mit_comp_id_t get_component_id(int id);
 
+// Find component id from i2c addr
+int i2c_addr_to_component_id(i2c_addr_t address, mit_comp_id_t * component_id);
+
 // Test application has been booted before
 void flash_first_boot(void);
 
