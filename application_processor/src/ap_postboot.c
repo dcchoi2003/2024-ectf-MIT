@@ -19,12 +19,19 @@
 int secure_send(uint8_t address, uint8_t* buffer, uint8_t len) {
     // TODO bounds check on len?
 
-    // TODO gross allocation
-    int ret = make_mit_packet(address, MIT_CMD_NONE, buffer, len);
+    mit_comp_id_t component_id = 0;
+    int ret = i2c_addr_to_component_id(address, &component_id);
+
+    if (ret == ERROR_RETURN) {
+        print_error("secure_receive: bad address provided 0x%02x\n", address);
+        return ERROR_RETURN;
+    }
+
+    ret = make_mit_packet(component_id, MIT_CMD_NONE, buffer, len);
     if (ret != SUCCESS_RETURN) {
         return ret;
     }
-    return send_mit_packet(address, get_tx_packet());
+    return send_mit_packet(component_id, get_tx_packet());
 }
 
 /**
