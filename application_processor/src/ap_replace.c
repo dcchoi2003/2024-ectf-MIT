@@ -16,9 +16,9 @@ void attempt_replace() {
     uint32_t component_id_in = 0;
     uint32_t component_id_out = 0;
 
-    recv_input("Component ID In: ", 8);
+    recv_input("Component ID In: ", 10);  // 0x + 8 chars
     sscanf(buf, "%x", &component_id_in);
-    recv_input("Component ID Out: ", 8);
+    recv_input("Component ID Out: ", 10); // 0x + 8 chars
     sscanf(buf, "%x", &component_id_out);
 
     if (swap_components(component_id_in, component_id_out) == ERROR_RETURN) {
