@@ -44,6 +44,7 @@
 
 // MIT: Includes for our custom features
 #include "ap_common.h"
+#include "nice.h"
 
 /********************************* UTILITIES **********************************/
 
@@ -107,6 +108,10 @@ int main() {
                 printf("  session.incoming_nonce: 0x");
                 print_hex(session->incoming_nonce.rawBytes, sizeof(mit_nonce_t));
             }
+            uint8_t * hashedPinPtr = getHashedPinPtr();
+            printf("Hashed Pin Ptr: 0x%x\n", hashedPinPtr);
+            printf("Hashed Pin: 0x");
+            print_hex(hashedPinPtr, 32);
         } else {
             print_error("Unrecognized command '%s'\n", buf);
         }

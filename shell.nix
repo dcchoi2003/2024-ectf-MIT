@@ -41,6 +41,11 @@ pkgs.mkShell {
     ref = "refs/tags/v5.6.3-stable";
   };
 
+  sha256_literal = builtins.fetchGit {
+    url = "https://github.com/aguinet/sha256_literal.git";
+    rev = "d7017a7b4bbc30bc93fb8bd4cf54555986d25ef0";
+  };
+
   shellHook =
     ''
       cp -r $msdk $PWD/msdk
@@ -51,5 +56,8 @@ pkgs.mkShell {
 
       cp -r $wolfssl $PWD/wolfssl
       chmod -R u+rwX,go+rX,go-w $PWD/wolfssl
+
+      cp -r $sha256_literal $PWD/sha256_literal
+      chmod -R u+rwX,go+rX,go-w $PWD/sha256_literal
     '';
 }

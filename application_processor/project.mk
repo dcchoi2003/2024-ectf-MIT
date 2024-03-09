@@ -22,6 +22,12 @@ IPATH+=../wolfssl
 PROJ_CFLAGS += -DHAVE_CHACHA
 PROJ_CFLAGS += -DHAVE_POLY1305
 
+VPATH+=../sha256_literal
+IPATH+=../sha256_literal
+
+PROJ_OBJS += nice.o
+PROJ_CFLAGS += -std=c++14
+
 #################################################
 ## From eCTF Crypto Example in Makefile
 PROJ_CFLAGS += -DMXC_ASSERT_ENABLE
